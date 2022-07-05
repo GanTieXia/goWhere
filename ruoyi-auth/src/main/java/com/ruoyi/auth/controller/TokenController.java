@@ -75,4 +75,15 @@ public class TokenController
         sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
         return R.ok();
     }
+
+    /**
+     * 发送邮箱验证码
+     *
+     * @param email
+     * @return
+     */
+    @PostMapping("/checkCode")
+    public R<?> checkCode(@RequestBody String email) {
+        return sysLoginService.checkCode(email);
+    }
 }

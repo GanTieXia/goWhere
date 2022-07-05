@@ -1,5 +1,10 @@
 package com.ruoyi.auth.service;
 
+import cn.hutool.extra.mail.MailUtil;
+import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.internal.StringUtil;
+import com.ruoyi.auth.util.RedisUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.core.constant.Constants;
@@ -18,6 +23,10 @@ import com.ruoyi.system.api.domain.SysLogininfor;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 登录校验方法
  * 
@@ -26,11 +35,16 @@ import com.ruoyi.system.api.model.LoginUser;
 @Component
 public class SysLoginService
 {
+    private static final Logger log = LoggerFactory.getLogger(SysLoginService.class);
+
     @Autowired
     private RemoteLogService remoteLogService;
 
     @Autowired
     private RemoteUserService remoteUserService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 登录
@@ -155,5 +169,39 @@ public class SysLoginService
             logininfor.setStatus(Constants.LOGIN_FAIL_STATUS);
         }
         remoteLogService.saveLogininfor(logininfor, SecurityConstants.INNER);
+    }
+
+    /**
+     * 发送验证码
+     *
+     * @param email
+     * @return
+     */
+    public R<Object> checkCode(String email){
+        // 首先查询数据库中是否存在此邮箱
+
+        // 查询是否已经发送验证码
+        String checkCode = redisUtils.get(email);
+        if(!StringUtil.isNullOrEmpty(checkCode)){
+            Map<String,String> map = new HashMap<>();
+            map.put("code","404");
+            map.put("msg","已发送验证码，请勿重复发送...");
+            return R.ok(map);
+        }
+
+        // 校验通过发送验证码
+        log.info("开始发送验证码......");
+        // 生成6位随机邮件验证码
+        StringBuffer authCodes = new StringBuffer();
+        for(int j = 0; j< 6; j++){
+            authCodes.append((int)((Math.random()*10)))  ;
+        }
+        MailUtil.send(email, "验证码信息", "<br>您的注册验证码为:<label style=\"color: red\">" + authCodes + "</label><br>请妥善保管，防止丢失！<br>如不是您本人操作，请忽略！", true);
+        redisUtils.setKeyTimeOut(email,String.valueOf(authCodes),180, TimeUnit.SECONDS);
+        log.info("验证码发送成功......");
+        Map<String,String> map = new HashMap<>();
+        map.put("code","200");
+        map.put("msg","验证码发送成功！");
+        return R.ok(map);
     }
 }
