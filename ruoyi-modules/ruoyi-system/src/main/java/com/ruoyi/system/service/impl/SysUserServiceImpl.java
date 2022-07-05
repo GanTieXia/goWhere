@@ -1,9 +1,14 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.web.domain.AjaxResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,9 @@ import com.ruoyi.system.mapper.SysUserPostMapper;
 import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+
+import static com.ruoyi.common.core.web.domain.AjaxResult.error;
+import static com.ruoyi.common.core.web.domain.AjaxResult.success;
 
 /**
  * 用户 业务层处理
@@ -538,4 +546,29 @@ public class SysUserServiceImpl implements ISysUserService
         return successMsg.toString();
     }
 
+    /**
+     * 校验邮箱是否重复
+     *
+     * @param email
+     * @return
+     */
+    @Override
+    public R<Map> isRepeatEmail(String email) {
+        // 返回结果集
+        Map<String,String> map = new HashMap<>();
+        // 校验
+        List<String> emailList = userMapper.selectAllValidEmail();
+        if(emailList.size() > 0){
+            for(String e : emailList){
+                if(email.equals(e)){
+                    map.put("code","404");
+                    map.put("msg","邮箱已被使用!");
+                    return R.fail(map);
+                }
+            }
+        }
+        map.put("code","200");
+        map.put("msg","邮箱校验通过...");
+        return R.ok(map);
+    }
 }

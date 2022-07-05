@@ -1,5 +1,6 @@
 package com.ruoyi.system.api;
 
+import com.ruoyi.common.core.web.domain.AjaxResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ public interface RemoteUserService
      * @return 结果
      */
     @GetMapping("/user/info/{username}")
-    public R<LoginUser> getUserInfo(@PathVariable("username") String username, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    R<LoginUser> getUserInfo(@PathVariable("username") String username, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
     /**
      * 注册用户信息
@@ -39,5 +40,17 @@ public interface RemoteUserService
      * @return 结果
      */
     @PostMapping("/user/register")
-    public R<Boolean> registerUserInfo(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    R<Boolean> registerUserInfo(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    /**
+     * 校验邮箱
+     *
+     * @param email
+     * @param source
+     * @return
+     */
+    @PostMapping("/user/checkEmail")
+    AjaxResult checkEmail(@RequestBody String email, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+
 }

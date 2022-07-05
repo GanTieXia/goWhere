@@ -124,4 +124,11 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+    /**
+     * 查询所有邮箱
+     *
+     * @return
+     */
+    List<String> selectAllValidEmail();
 }

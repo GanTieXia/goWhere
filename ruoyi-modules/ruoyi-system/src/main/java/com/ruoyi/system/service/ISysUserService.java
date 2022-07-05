@@ -1,6 +1,10 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+import java.util.Map;
+
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.system.api.domain.SysUser;
 
 /**
@@ -203,4 +207,12 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 校验邮箱是否重复
+     *
+     * @param email
+     * @return
+     */
+    R<Map> isRepeatEmail(String email);
 }

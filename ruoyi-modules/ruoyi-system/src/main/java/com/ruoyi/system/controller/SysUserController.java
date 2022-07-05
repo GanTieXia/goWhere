@@ -2,9 +2,12 @@ package com.ruoyi.system.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -308,5 +311,14 @@ public class SysUserController extends BaseController
         userService.checkUserDataScope(userId);
         userService.insertUserAuth(userId, roleIds);
         return success();
+    }
+
+    /**
+     * 邮箱校验
+     */
+    @PostMapping("/checkEmail")
+    public R<Map> checkEmail(@RequestBody String email)
+    {
+        return userService.isRepeatEmail(email);
     }
 }
