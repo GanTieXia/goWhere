@@ -14,6 +14,8 @@ import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.factory.RemoteUserFallbackFactory;
 import com.ruoyi.system.api.model.LoginUser;
 
+import java.util.Map;
+
 /**
  * 用户服务
  * 
@@ -50,7 +52,7 @@ public interface RemoteUserService
      * @return
      */
     @PostMapping("/user/checkEmail")
-    AjaxResult checkEmail(@RequestBody String email, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    R<Map<String,String>> checkEmail(@RequestBody String email, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 
 }

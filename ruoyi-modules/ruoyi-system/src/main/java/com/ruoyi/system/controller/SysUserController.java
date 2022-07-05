@@ -317,7 +317,7 @@ public class SysUserController extends BaseController
      * 邮箱校验
      */
     @PostMapping("/checkEmail")
-    public R<Map> checkEmail(@RequestBody String email)
+    public R<Map<String,String>> checkEmail(@RequestBody String email)
     {
         return userService.isRepeatEmail(email);
     }

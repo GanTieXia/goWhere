@@ -10,6 +10,8 @@ import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
 
+import java.util.Map;
+
 /**
  * 用户服务降级处理
  * 
@@ -39,8 +41,8 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
             }
 
             @Override
-            public AjaxResult checkEmail(String email, String source) {
-                return AjaxResult.error("验证码发送失败:" + throwable.getMessage());
+            public R<Map<String,String>> checkEmail(String email, String source) {
+                return R.fail("邮箱验证码发送失败！");
             }
         };
     }

@@ -214,5 +214,5 @@ public interface ISysUserService
      * @param email
      * @return
      */
-    R<Map> isRepeatEmail(String email);
+    R<Map<String,String>> isRepeatEmail(String email);
 }

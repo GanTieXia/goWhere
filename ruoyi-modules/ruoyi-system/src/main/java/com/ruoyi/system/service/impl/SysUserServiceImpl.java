@@ -553,7 +553,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return
      */
     @Override
-    public R<Map> isRepeatEmail(String email) {
+    public R<Map<String,String>> isRepeatEmail(String email) {
         // 返回结果集
         Map<String,String> map = new HashMap<>();
         // 校验

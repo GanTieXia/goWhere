@@ -185,16 +185,6 @@ public class SysLoginService
     public R<Object> checkCode(String email){
         // 返回结果集
         Map<String,String> resultMap = new HashMap<>();
-        // 首先查询数据库中是否存在此邮箱
-        RestTemplate restTemplate = new RestTemplate();
-//        String url = "http://localhost:9201/user/checkEmail";
-//        MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<String, Object>();
-//        paramMap.add("email", "1336024089@qq.com");
-//        String result = restTemplate.postForObject(url, paramMap, String.class);
-//        Map<String,String> dataMap = (Map) JSON.parse(result);
-//        System.out.println(dataMap.get("code"));
-        AjaxResult result = remoteUserService.checkEmail(email,SecurityConstants.FROM_SOURCE);
-
         // 查询是否已经发送验证码
         String checkCode = redisUtils.get(email);
         if(!StringUtil.isNullOrEmpty(checkCode)){
@@ -202,7 +192,14 @@ public class SysLoginService
             resultMap.put("msg","已发送验证码，请勿重复发送...");
             return R.ok(resultMap);
         }
-
+        // 查询数据库中是否存在此邮箱
+        R<Map<String,String>> result = remoteUserService.checkEmail(email,SecurityConstants.FROM_SOURCE);
+        Map<String, String> resultCheckMap = result.getData();
+        if(!"200".equals(resultCheckMap.get("code"))){
+            resultMap.put("code","405");
+            resultMap.put("msg","此邮箱已被绑定，请确认邮箱是否输入有误！");
+            return R.ok(resultMap);
+        }
         // 校验通过发送验证码
         log.info("开始发送验证码......");
         // 生成6位随机邮件验证码
@@ -210,22 +207,13 @@ public class SysLoginService
         for(int j = 0; j< 6; j++){
             authCodes.append((int)((Math.random()*10)))  ;
         }
-        MailUtil.send(email, "验证码信息", "<br>您的注册验证码为:<label style=\"color: red\">" + authCodes + "</label><br>请妥善保管，防止丢失！<br>如不是您本人操作，请忽略！", true);
+        // 发送验证码
+        MailUtil.send(email, "验证码信息", "<br>您的注册验证码为: <label style=\"color: red\"> " + authCodes + "</label> <br>请妥善保管，防止丢失！<br>如不是您本人操作，请忽略！", true);
+        // 将验证码存入redis并设置三分钟失效时间
         redisUtils.setKeyTimeOut(email,String.valueOf(authCodes),180, TimeUnit.SECONDS);
         log.info("验证码发送成功......");
         resultMap.put("code","200");
         resultMap.put("msg","验证码发送成功！");
         return R.ok(resultMap);
-    }
-
-    public static void main(String[] args) {
-        // 首先查询数据库中是否存在此邮箱
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:9201/user/checkEmail";
-        MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<String, Object>();
-        paramMap.add("email", "1336024089@qq.com");
-        String result = restTemplate.postForObject(url, paramMap, String.class);
-        Map<String,String> dataMap = (Map) JSON.parse(result);
-        System.out.println(dataMap.get("code"));
     }
 }
