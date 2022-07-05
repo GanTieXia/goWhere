@@ -65,11 +65,11 @@
             </dependency>
 
             <!-- Alibaba Nacos 配置 -->
-            <dependency>
-                <groupId>com.alibaba.nacos</groupId>
-                <artifactId>nacos-client</artifactId>
-                <version>${alibaba.nacos.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.alibaba.nacos</groupId>-->
+<!--                <artifactId>nacos-client</artifactId>-->
+<!--                <version>${alibaba.nacos.version}</version>-->
+<!--            </dependency>-->
 
             <!-- Alibaba Seata 配置 -->
             <dependency>

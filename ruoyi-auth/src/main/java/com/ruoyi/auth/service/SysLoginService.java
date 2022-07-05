@@ -3,7 +3,6 @@ package com.ruoyi.auth.service;
 import cn.hutool.extra.mail.MailUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.internal.StringUtil;
 import com.ruoyi.auth.util.RedisUtils;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import org.slf4j.Logger;
@@ -188,7 +187,7 @@ public class SysLoginService
         Map<String,String> resultMap = new HashMap<>();
         // 查询是否已经发送验证码
         String checkCode = redisUtils.get(email);
-        if(!StringUtil.isNullOrEmpty(checkCode)){
+        if(!StringUtils.isEmpty(checkCode)){
             resultMap.put("code","404");
             resultMap.put("msg","已发送验证码，请勿重复发送...");
             return R.ok(resultMap);
