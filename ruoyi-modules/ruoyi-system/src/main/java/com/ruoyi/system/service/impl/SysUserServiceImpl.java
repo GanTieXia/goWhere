@@ -554,6 +554,7 @@ public class SysUserServiceImpl implements ISysUserService
      */
     @Override
     public R<Map<String,String>> isRepeatEmail(String email) {
+        log.info(email +"，开始邮箱校验...");
         // 返回结果集
         Map<String,String> map = new HashMap<>();
         // 校验
@@ -563,12 +564,14 @@ public class SysUserServiceImpl implements ISysUserService
                 if(email.equals(e)){
                     map.put("code","404");
                     map.put("msg","邮箱已被使用!");
+                    log.info(email +"，此邮箱已被使用...");
                     return R.fail(map);
                 }
             }
         }
         map.put("code","200");
         map.put("msg","邮箱校验通过...");
+        log.info(email +"，邮箱校验通过...");
         return R.ok(map);
     }
 }

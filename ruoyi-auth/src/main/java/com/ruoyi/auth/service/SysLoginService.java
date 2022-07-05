@@ -2,6 +2,7 @@ package com.ruoyi.auth.service;
 
 import cn.hutool.extra.mail.MailUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.internal.StringUtil;
 import com.ruoyi.auth.util.RedisUtils;
 import com.ruoyi.common.core.web.domain.AjaxResult;
@@ -182,7 +183,7 @@ public class SysLoginService
      * @param email
      * @return
      */
-    public R<Object> checkCode(String email){
+    public R<Object> sendCheckCode(String email){
         // 返回结果集
         Map<String,String> resultMap = new HashMap<>();
         // 查询是否已经发送验证码
@@ -205,7 +206,7 @@ public class SysLoginService
         // 生成6位随机邮件验证码
         StringBuffer authCodes = new StringBuffer();
         for(int j = 0; j< 6; j++){
-            authCodes.append((int)((Math.random()*10)))  ;
+            authCodes.append((int)((Math.random()*10)));
         }
         // 发送验证码
         MailUtil.send(email, "验证码信息", "<br>您的注册验证码为: <label style=\"color: red\"> " + authCodes + "</label> <br>请妥善保管，防止丢失！<br>如不是您本人操作，请忽略！", true);
@@ -214,6 +215,32 @@ public class SysLoginService
         log.info("验证码发送成功......");
         resultMap.put("code","200");
         resultMap.put("msg","验证码发送成功！");
+        return R.ok(resultMap);
+    }
+
+    /**
+     * 校验输入验证码的正确性
+     *
+     * @param emailInfo
+     * @return
+     */
+    public R<Object> checkCode(String emailInfo){
+        Map<String,String> messageMap = (Map) JSON.parse(emailInfo);
+        String email = messageMap.get("email");
+        String emailCode = messageMap.get("emailCode");
+        // 返回结果集
+        Map<String,String> resultMap = new HashMap<>();
+        // 从Redis中获取验证码
+        String code = redisUtils.get(email);
+        // 校验
+        // 如果为空，则未发送验证码
+        if(!emailCode.equals(code)){
+            resultMap.put("code","404");
+            resultMap.put("msg","邮箱验证码错误！");
+            return R.ok(resultMap);
+        }
+        resultMap.put("code","200");
+        resultMap.put("msg","邮箱验证通过！");
         return R.ok(resultMap);
     }
 }
