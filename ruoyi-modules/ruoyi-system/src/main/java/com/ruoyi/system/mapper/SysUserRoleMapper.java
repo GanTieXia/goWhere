@@ -59,4 +59,20 @@ public interface SysUserRoleMapper
      * @return 结果
      */
     public int deleteUserRoleInfos(@Param("roleId") Long roleId, @Param("userIds") Long[] userIds);
+
+    /**
+     * 赋默认的用户角色
+     *
+     * @param userId
+     * @return
+     */
+    int setUserRole(String userId);
+
+    /**
+     * 通过姓名查找用户ID
+     *
+     * @param userName
+     * @return
+     */
+    String byUserNameFindUserId(String userName);
 }

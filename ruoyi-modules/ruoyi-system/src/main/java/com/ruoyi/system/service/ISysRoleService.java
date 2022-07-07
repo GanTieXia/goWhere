@@ -1,7 +1,10 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.domain.SysUserRole;
 
@@ -170,4 +173,20 @@ public interface ISysRoleService
      * @return 结果
      */
     public int insertAuthUsers(Long roleId, Long[] userIds);
+
+    /**
+     * 赋默认的用户角色
+     *
+     * @param userId
+     * @return
+     */
+    R<Map<String,String>> setUserRole(String userId);
+
+    /**
+     * 通过姓名查找用户ID
+     *
+     * @param userName
+     * @return
+     */
+    R<Map<String,String>> byUserNameFindUserId(String userName);
 }

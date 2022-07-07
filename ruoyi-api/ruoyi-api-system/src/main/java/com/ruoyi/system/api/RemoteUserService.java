@@ -54,5 +54,26 @@ public interface RemoteUserService
     @PostMapping("/user/checkEmail")
     R<Map<String,String>> checkEmail(@RequestBody String email, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
+    /**
+     * 设置默认角色
+     *
+     * @param userId
+     * @param source
+     * @return
+     */
+    @PostMapping("/user/setUserRole")
+    R<Map<String,String>> setUserRole(@RequestBody String userId, @RequestHeader(SecurityConstants.INNER) String source);
+
+    /**
+     * 通过用户名找到userId
+     *
+     * @param userName
+     * @param source
+     * @return
+     */
+    @PostMapping("/user/getUserId")
+    R<Map<String,String>> getUserId(@RequestBody String userName, @RequestHeader(SecurityConstants.INNER) String source);
+
+
 
 }

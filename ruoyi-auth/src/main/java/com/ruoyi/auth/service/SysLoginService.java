@@ -118,7 +118,7 @@ public class SysLoginService
     /**
      * 注册
      */
-    public void register(String username, String password)
+    public void register(String username, String password, String email, String emailCode)
     {
         // 用户名或密码为空 错误
         if (StringUtils.isAnyBlank(username, password))
@@ -136,12 +136,41 @@ public class SysLoginService
             throw new ServiceException("密码长度必须在5到20个字符之间");
         }
 
+        // 用户名唯一性校验
+        R<Map<String,String>> r = remoteUserService.getUserId(username,SecurityConstants.INNER);
+        Map<String, String> rMap = r.getData();
+        if(StringUtils.isNotEmpty(rMap.get("userId"))){
+            throw new ServiceException("用户名已被占用");
+        }
+
+        // 邮箱验证
+        String check = "(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))";
+        if(!email.matches(check)){
+            throw new ServiceException("邮箱格式错误");
+        }
+        // 邮箱验证码验证
+        String code = redisUtils.get(email);
+        if(!emailCode.equals(code)){
+            throw new ServiceException("邮箱验证码错误或失效，请重新发送");
+        }
         // 注册用户信息
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
         sysUser.setNickName(username);
         sysUser.setPassword(SecurityUtils.encryptPassword(password));
+        sysUser.setEmail(email);
         R<?> registerResult = remoteUserService.registerUserInfo(sysUser, SecurityConstants.INNER);
+
+        // 找到用户ID
+        R<Map<String,String>> result = remoteUserService.getUserId(username,SecurityConstants.INNER);
+        Map<String, String> resultCheckMap = result.getData();
+        String userId = resultCheckMap.get("userId");
+        // 默认角色为普通角色
+        R<Map<String,String>> resultThis = remoteUserService.setUserRole(userId,SecurityConstants.INNER);
+        Map<String, String> resultThisMap = resultThis.getData();
+        if(!"200".equals(resultThisMap.get("code"))){
+            throw new ServiceException("网络波动，请稍后再试...");
+        }
 
         if (R.FAIL == registerResult.getCode())
         {

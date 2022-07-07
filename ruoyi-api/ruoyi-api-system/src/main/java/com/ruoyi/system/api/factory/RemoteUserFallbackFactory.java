@@ -42,7 +42,17 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
 
             @Override
             public R<Map<String,String>> checkEmail(String email, String source) {
-                return R.fail("邮箱验证码发送失败！");
+                return R.fail("邮箱验证码发送失败：" + throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<String, String>> setUserRole(String userId, String source) {
+                return R.fail("网络波动，请稍后再试...");
+            }
+
+            @Override
+            public R<Map<String, String>> getUserId(String userName, String source) {
+                return R.fail("网络波动，请稍后再试...");
             }
         };
     }

@@ -1,10 +1,8 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import com.ruoyi.common.core.domain.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -420,5 +418,49 @@ public class SysRoleServiceImpl implements ISysRoleService
             list.add(ur);
         }
         return userRoleMapper.batchUserRole(list);
+    }
+
+    /**
+     * 赋默认的用户角色
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public R<Map<String,String>> setUserRole(String userId) {
+        // 执行新增操作
+        int n = userRoleMapper.setUserRole(userId);
+        // 返回结果
+        Map<String,String> map = new HashMap<>();
+        if(n == 1){
+            map.put("code","200");
+            map.put("msg","角色初始化成功！");
+        } else {
+            map.put("code","404");
+            map.put("msg","角色初始化失败！");
+        }
+        return R.ok(map);
+    }
+
+    /**
+     * 通过姓名查找用户ID
+     *
+     * @param userName
+     * @return
+     */
+    @Override
+    public R<Map<String, String>> byUserNameFindUserId(String userName) {
+        // 返回结果
+        Map<String,String> map = new HashMap<>();
+        // 获取ID
+        String userId = userRoleMapper.byUserNameFindUserId(userName);
+        if(StringUtils.isNotEmpty(userId)){
+            map.put("code","200");
+            map.put("userId",userId);
+        } else {
+            map.put("code","404");
+            map.put("userId","");
+        }
+        return R.ok(map);
     }
 }

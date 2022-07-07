@@ -321,4 +321,23 @@ public class SysUserController extends BaseController
     {
         return userService.isRepeatEmail(email);
     }
+
+    /**
+     * 赋默认的用户角色
+     */
+    @PostMapping("/setUserRole")
+    public R<Map<String,String>> setUserRole(@RequestBody String userId)
+    {
+        return roleService.setUserRole(userId);
+    }
+
+    /**
+     * 通过姓名查找用户ID
+     */
+    @PostMapping("/getUserId")
+    public R<Map<String,String>> byUserNameFindUserId(@RequestBody String userName)
+    {
+        return roleService.byUserNameFindUserId(userName);
+    }
+
 }
