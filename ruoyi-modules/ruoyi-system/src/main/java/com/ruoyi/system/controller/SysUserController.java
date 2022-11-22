@@ -136,6 +136,7 @@ public class SysUserController extends BaseController
     @PostMapping("/register")
     public R<Boolean> register(@RequestBody SysUser sysUser)
     {
+        logger.info("我进来了");
         String username = sysUser.getUserName();
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser"))))
         {

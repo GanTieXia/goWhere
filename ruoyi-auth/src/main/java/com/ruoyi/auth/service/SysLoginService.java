@@ -137,12 +137,12 @@ public class SysLoginService
         }
 
         // 用户名唯一性校验
+        log.info("用户名：" + username);
         R<Map<String,String>> r = remoteUserService.getUserId(username,SecurityConstants.INNER);
         Map<String, String> rMap = r.getData();
         if(StringUtils.isNotEmpty(rMap.get("userId"))){
             throw new ServiceException("用户名已被占用");
         }
-
         // 邮箱验证
         String check = "(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))";
         if(!email.matches(check)){
@@ -160,17 +160,24 @@ public class SysLoginService
         sysUser.setPassword(SecurityUtils.encryptPassword(password));
         sysUser.setEmail(email);
         R<?> registerResult = remoteUserService.registerUserInfo(sysUser, SecurityConstants.INNER);
-
         // 找到用户ID
         R<Map<String,String>> result = remoteUserService.getUserId(username,SecurityConstants.INNER);
         Map<String, String> resultCheckMap = result.getData();
         String userId = resultCheckMap.get("userId");
+        log.info("用户ID：" + userId);
         // 默认角色为普通角色
         R<Map<String,String>> resultThis = remoteUserService.setUserRole(userId,SecurityConstants.INNER);
+        log.info("================================");
+        log.info("设置为普通角色结果：" + resultThis);
+        log.info(String.valueOf(resultThis.getCode()));
+        log.info(resultThis.getData().toString());
+        log.info("================================");
         Map<String, String> resultThisMap = resultThis.getData();
+        log.info("设置为普通角色结果：" + resultThisMap.get("code"));
         if(!"200".equals(resultThisMap.get("code"))){
             throw new ServiceException("网络波动，请稍后再试...");
         }
+        log.info("4结束");
 
         if (R.FAIL == registerResult.getCode())
         {
@@ -181,7 +188,7 @@ public class SysLoginService
 
     /**
      * 记录登录信息
-     * 
+     *
      * @param username 用户名
      * @param status 状态
      * @param message 消息内容
@@ -212,10 +219,13 @@ public class SysLoginService
      * @return
      */
     public R<Object> sendCheckCode(String email){
+        log.info("开始发送验证码......");
+        log.info("入参邮箱：" + email);
         // 返回结果集
         Map<String,String> resultMap = new HashMap<>();
         // 查询是否已经发送验证码
         String checkCode = redisUtils.get(email);
+        log.info("redis中的邮箱验证码：" + checkCode);
         if(!StringUtils.isEmpty(checkCode)){
             resultMap.put("code","404");
             resultMap.put("msg","已发送验证码，请勿重复发送...");
