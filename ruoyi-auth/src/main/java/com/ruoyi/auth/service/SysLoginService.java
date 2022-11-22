@@ -7,7 +7,9 @@ import com.ruoyi.auth.util.RedisUtils;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.SecurityConstants;
@@ -50,6 +52,12 @@ public class SysLoginService
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Value("${auth.loginQueueName}")
+    private String loginQueueName;
 
     /**
      * 登录
@@ -107,6 +115,8 @@ public class SysLoginService
             throw new ServiceException("用户不存在/密码错误");
         }
         recordLogininfor(username, Constants.LOGIN_SUCCESS, "登录成功");
+        // 用户登录后向MQ发送消息队列
+        rabbitTemplate.convertAndSend(loginQueueName,"{\"username\"+\""+ username + "\"}");
         return userInfo;
     }
 
