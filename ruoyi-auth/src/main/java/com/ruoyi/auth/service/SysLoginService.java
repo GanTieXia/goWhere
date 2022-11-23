@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 登录校验方法
- * 
+ *
  * @author ruoyi
  */
 @Component
@@ -116,7 +116,9 @@ public class SysLoginService
         }
         recordLogininfor(username, Constants.LOGIN_SUCCESS, "登录成功");
         // 用户登录后向MQ发送消息队列
-        rabbitTemplate.convertAndSend(loginQueueName,"{\"username\"+\""+ username + "\"}");
+        String message = "{\"userName\":\""+ username + "\"}";
+        rabbitTemplate.convertAndSend(loginQueueName,message);
+        log.info("登陆消息：" + message + ",已发送至消息队列=====>"+ loginQueueName +"");
         return userInfo;
     }
 

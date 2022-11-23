@@ -30,19 +30,20 @@ public class QueueConsumer {
      */
     @RabbitListener(queues = "auth.loginQueue")
     public void listenQueue(String msg){
+        log.info("=========开始消费登录消息："+ msg +"=========");
         // 解析消息
         JSONObject prams = JSON.parseObject(msg);
         // 获取用户名
         String userName = prams.getString("userName");
-        log.info("=========解析后的消息=========");
-        log.info("userName:" + userName);
+        log.info("=========解析后的用户名userName：" + userName + "=========");
         // 给用户发送邮件提示已登录系统
         SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
         String email = sysUser.getEmail();
         // 执行发送邮件操作
         // 发送验证码
-        MailUtil.send(email, "去哪儿系统登录提示", "<br>亲爱的用户: <label style=\"color: red\"> " +
-                userName + "</label> 您已登录 www.hailin.pro 去哪儿网！<br>", true);
-
+        log.info("=========给登陆人发送邮件（"+ email +"）=========");
+        MailUtil.send(email, "去哪儿系统登录提示", "<br>亲爱的用户: <label style=\"color: red\"> " + userName + "</label> " +
+                "<br>您已登录 <a style=\"font-style:italic;\" href=\"https://www.hailin.pro\">https://www.hailin.pro</a> 去哪儿网！<br>", true);
+        log.info("=========邮件发送成功=========");
     }
 }
